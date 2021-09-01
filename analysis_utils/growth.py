@@ -1,6 +1,8 @@
 import pandas as pd
 from typing import Union
 
+import logging
+
 
 def growth_by_time(df: pd.DataFrame,
                    price_col: str = "Open",
@@ -21,12 +23,14 @@ def growth_by_time(df: pd.DataFrame,
 
     if year is not None:
         year = str(year)
-        df_tmp = df_tmp[df_tmp[date_col].apply(lambda x: year in x)].copy()
+        df_tmp = df_tmp[df_tmp[date_col].apply(lambda x: year in str(x))].copy()
     df_tmp.sort_values(by=date_col, inplace=True)
-    # df is ascending, going up
+    # logging.info(f"{df_tmp.head(3)}")
+    print(f"{df_tmp.head(3)}")
+    # date is ascending, going up
     if return_type == "percentage":
-        return (df_tmp.iloc[0][price_col] - df_tmp.iloc[-1][price_col]) / df_tmp.iloc[-1][price_col]
+        return (-df_tmp.iloc[0][price_col] + df_tmp.iloc[-1][price_col]) / df_tmp.iloc[0][price_col] * 100
     elif return_type == "absolute":
-        return (df_tmp.iloc[0][price_col] - df_tmp.iloc[-1][price_col])
+        return (-df_tmp.iloc[0][price_col] + df_tmp.iloc[-1][price_col])
     else:
         raise ValueError(f"dont recognize return_type = {return_type}")
