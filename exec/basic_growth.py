@@ -14,8 +14,9 @@ def plot_yoy_growth(df: pd.DataFrame):
     print(growth_pcts)
     plt.bar(years, growth_pcts)
     plt.title(f"yoy% growth")
-    plt.show()
     plt.savefig(f"{PLOT_FOLDER}/yoy_ETF.png")
+
+    plt.show()
 
 
 def plot_mom_growth(df: pd.DataFrame):
@@ -51,5 +52,5 @@ if __name__ == "__main__":
     df = pd.read_csv(data_filepath)
     df = clean_df_v1(df)
     # print(df)
-    # plot_yoy_growth(df)
+    plot_yoy_growth(df)
     plot_mom_growth(df)
