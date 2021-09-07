@@ -30,7 +30,10 @@ def plot_mom_growth(df: pd.DataFrame):
     df_tmp_2["Last"] = df_tmp.last()[["Open"]]
     df_tmp_2["mom_pct"] = (df_tmp_2["Last"]-df_tmp_2["Open"])/df_tmp_2["Open"] * 100
     df_tmp_2[["mom_pct"]].plot(marker="o")
+    plt.savefig(f"{PLOT_FOLDER}/mom_ETF.png")
+
     plt.show()
+
     print(df_tmp_2)
 
 
