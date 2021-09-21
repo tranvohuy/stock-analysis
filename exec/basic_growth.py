@@ -3,10 +3,12 @@ from analysis_utils import growth
 import matplotlib.pyplot as plt
 from typing import List
 
-PLOT_FOLDER = "../plots"
 
+PLOT_FOLDER = "../plots"
+APPLE = "apple"
+SP500Info = "SP500Info"
 instrument_name = "apple"
-instrument_name = "SP500Info"
+instrument_name = SP500Info
 
 data_link_dict = {
     "apple": "../data/AAPL.csv",
@@ -15,25 +17,24 @@ data_link_dict = {
 
 
 def plot_over_years(df: pd.DataFrame, instrument_name: str):
-    years = [2021, 2020, 2019, 2018, 2017, 2016]
+    years = [2021, 2020, 2019, 2018, 2017, 2016, 2015]
     plt.title(f"{instrument_name} stock price each year")
 
     for year in years:
-        df_tmp = df[df["Date"].dt.year == year]
-        # df_tmp["month_date"] = df_tmp["Date"].apply(lambda x: str(x.month) + "/" + str(x.day))
-        # df_tmp["month_date"] =  list(df_tmp["Date"].dt.month.to_string()) + "/" + df_tmp["Date"].dt.day)
+        df_tmp = df[df["Date"].dt.year == year].copy()
+        # TODO: think of a way to plot with Month-Day also.
+        # lunar year will give problem
         plt.plot(df_tmp["Date"].dt.dayofyear, df_tmp["Open"])
-        # plt.plot(df_tmp["month_date"], df_tmp["Open"])
+
     plt.xlabel("Day of year")
     plt.ylabel("Instrument price")
-    plt.legend(years, loc="upper right", bbox_to_anchor=(1.2, 1))
+    plt.legend(years, loc="upper right", bbox_to_anchor=(1.15, 1))
     plt.savefig(f"{PLOT_FOLDER}/plot_over_years_{instrument_name}.png")
 
     plt.show()
 
 
 def plot_yoy_growth(df: pd.DataFrame, instrument_name: str, years: List[int] = None):
-
     if years is None:
         # assume df has colume Date of pd.datetime Series
         years = list(set(df.Date.dt.year))
@@ -56,12 +57,18 @@ def plot_mom_growth(df: pd.DataFrame, instrument_name: str):
     :param df:
     :return:
     """
-    df_tmp = df.groupby(df.Date.dt.to_period("M"))
+    df_tmp = df.groupby(df.Date.dt.to_period("1M"))
 
     df_tmp_2 = df_tmp.first()[["Open"]]
     df_tmp_2["Last"] = df_tmp.last()[["Open"]]
-    df_tmp_2["mom_pct"] = (df_tmp_2["Last"]-df_tmp_2["Open"])/df_tmp_2["Open"] * 100
-    df_tmp_2[["mom_pct"]].plot(marker=".", grid=True, title=f"{instrument_name}")
+    df_tmp_2["mom_pct"] = (df_tmp_2["Last"] - df_tmp_2["Open"]) / df_tmp_2["Open"] * 100
+    # df_tmp_2[["mom_pct"]].plot(marker=".", grid=True, title=f"{instrument_name}")
+    # plt.bar(df_tmp_2[["mom_pct"]])
+    # df_tmp_2[["mom_pct"]].plot.bar(grid=True, title=f"{instrument_name}")
+    ax = plt.subplot(111)
+    df_tmp_2[["mom_pct"]].plot(use_index=True, kind="bar", title=f"{instrument_name}")
+    ax.xaxis_date()
+    plt.xticks()
     # df_tmp_2[["mom_pct"]].plot(kind="hist", grid=True, title="S&P500 Inf.Tech.")
 
     plt.savefig(f"{PLOT_FOLDER}/mom_{instrument_name}.png")
@@ -71,23 +78,34 @@ def plot_mom_growth(df: pd.DataFrame, instrument_name: str):
     print(df_tmp_2)
 
 
-def clean_df_v1(df):
+def clean_df_v1(df: pd.DataFrame, instrument_name: str):
     # remove null
-    df = df[~df["Open"].isnull()].copy()
+    df_tmp = df[~df["Open"].isnull()].copy()
     # df = clean_day(df)
     # reformate Date column
-    df["Date"] = pd.to_datetime(df["Date"])
-    return df
+    df_tmp["Date"] = pd.to_datetime(df_tmp["Date"])
+    if instrument_name == SP500Info:
+        df_tmp = df_tmp[df_tmp["Date"] != "2018-05-21"].copy()
+    return df_tmp
+
+
+def EDA(df: pd.DataFrame):
+    # for any adhoc analysis
+    n = 3
+    df = df.iloc[:10].copy()
+    base_vector = base_vector = list(df.iloc[-n:]["Open"])
+    print(f"most recent {n} Open price: {base_vector}")
+    (ind, distance) = closest_behavior(base_vector=base_vector, vector=list(df["Open"]))
+    print(ind, distance)
+    print(f"Closest distance is {df.iloc[ind:ind+n]}")
 
 
 if __name__ == "__main__":
     data_filepath = data_link_dict[instrument_name]
     df = pd.read_csv(data_filepath)
-    df = clean_df_v1(df)
-    # print(dir(df.Date.dt))
-    # print(df.Date.dt.dayofyear)
-    # print(df.iloc[0].Date.day)
-    plot_over_years(df, instrument_name)
+    df = clean_df_v1(df, instrument_name)
+    EDA(df)
+
+    # plot_over_years(df, instrument_name)
     # plot_yoy_growth(df, instrument_name)
     # plot_mom_growth(df, instrument_name)
-
