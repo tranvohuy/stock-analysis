@@ -78,14 +78,25 @@ def plot_mom_growth(df: pd.DataFrame, instrument_name: str):
     print(df_tmp_2)
 
 
+def remove_bad_days_with_price(df: pd.DataFrame, instrument_name: str):
+    if instrument_name == SP500Info:
+        df_tmp = df[df["Date"] != "2018-05-21"].copy()
+    return df_tmp
+
+
+def remove_null_value_rows(df: pd.DataFrame, col_name: str):
+    return df[~df["Open"].isnull()].copy()
+
+
 def clean_df_v1(df: pd.DataFrame, instrument_name: str):
     # remove null
-    df_tmp = df[~df["Open"].isnull()].copy()
+    df_tmp = remove_null_value_rows(df, col_name="Open")
     # df = clean_day(df)
+
     # reformat Date column
     df_tmp["Date"] = pd.to_datetime(df_tmp["Date"])
-    if instrument_name == SP500Info:
-        df_tmp = df_tmp[df_tmp["Date"] != "2018-05-21"].copy()
+
+    df_tmp = remove_bad_days_with_price(df_tmp, instrument_name)
     return df_tmp
 
 
