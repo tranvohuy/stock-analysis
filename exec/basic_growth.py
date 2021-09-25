@@ -2,7 +2,7 @@ import pandas as pd
 from analysis_utils import growth
 import matplotlib.pyplot as plt
 from typing import List
-
+from analysis_utils.calculations import closest_behavior
 
 PLOT_FOLDER = "../plots"
 APPLE = "apple"
@@ -11,8 +11,8 @@ instrument_name = "apple"
 instrument_name = SP500Info
 
 data_link_dict = {
-    "apple": "../data/AAPL.csv",
-    "SP500Info": "../data/QDVE.F.csv",
+    APPLE: "../data/AAPL.csv",
+    SP500Info: "../data/QDVE.F.csv",
 }
 
 
@@ -82,7 +82,7 @@ def clean_df_v1(df: pd.DataFrame, instrument_name: str):
     # remove null
     df_tmp = df[~df["Open"].isnull()].copy()
     # df = clean_day(df)
-    # reformate Date column
+    # reformat Date column
     df_tmp["Date"] = pd.to_datetime(df_tmp["Date"])
     if instrument_name == SP500Info:
         df_tmp = df_tmp[df_tmp["Date"] != "2018-05-21"].copy()
