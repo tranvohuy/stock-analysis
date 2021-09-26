@@ -33,9 +33,7 @@ def test_shift_vector_difference_2(input, output):
 
 
 def test_closest_period():
-    """
-    Test that it can sum a list of integers
-    """
+    """ """
     base_vector = [1, 2]
     vector = [1, 2, 3, 4]
     (ind, distance) = closest_period(base_vector, vector)
