@@ -17,7 +17,6 @@ def test_shift_vector_differe_1(input, output):
     """
     Test that it can sum a list of integers
     """
-    # vector = np.array([1, 2, 3, 4])
     assert list(shift_vector_difference(input)) == output
 
 
@@ -29,10 +28,7 @@ def test_shift_vector_differe_1(input, output):
     ],
 )
 def test_shift_vector_difference_2(input, output):
-    """
-    Test that it can sum a list of integers
-    """
-    # vector = np.array([1, 2, 3, 4])
+    """ """
     assert list(shift_vector_difference(input)) != output
 
 
