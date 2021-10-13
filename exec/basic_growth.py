@@ -3,10 +3,9 @@ from analysis_utils import growth
 import matplotlib.pyplot as plt
 from typing import List
 from analysis_utils.calculations import closest_behavior
+from .instrument_constants import *
 
 PLOT_FOLDER = "../plots"
-APPLE = "apple"
-SP500Info = "SP500Info"
 instrument_name = "apple"
 instrument_name = SP500Info
 
@@ -78,9 +77,9 @@ def plot_mom_growth(df: pd.DataFrame, instrument_name: str):
     print(df_tmp_2)
 
 
-def remove_bad_days_with_price(df: pd.DataFrame, instrument_name: str):
+def remove_days_of_bad_price(df: pd.DataFrame, instrument_name: str):
     if instrument_name == SP500Info:
-        df_tmp = df[df["Date"] != "2018-05-21"].copy()
+        df_tmp = df[~df["Date"].isin(["2018-05-21", "2017-06-05"])].copy()
     return df_tmp
 
 
@@ -96,7 +95,7 @@ def clean_df_v1(df: pd.DataFrame, instrument_name: str):
     # reformat Date column
     df_tmp["Date"] = pd.to_datetime(df_tmp["Date"])
 
-    df_tmp = remove_bad_days_with_price(df_tmp, instrument_name)
+    df_tmp = remove_days_of_bad_price(df_tmp, instrument_name)
     return df_tmp
 
 
